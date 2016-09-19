@@ -1,0 +1,50 @@
+<h1>AWS EC2 Manegers</h1>
+
+<br />
+
+<p style="color: red;"><%= @errorMsg %></p>
+<table border="1" cellspacing="0" cellpadding="5">
+  <thead bgcolor="#ff9900">
+    <tr>
+      <th>Instance Id</th>
+      <th style="min-width: 100px">Name</th>
+      <th style="min-width: 70px">Status</th>
+      <th style="min-width: 450px">Public DNS</th>
+      <th style="min-width: 100px">Public IP</th>
+      <th colspan="1" style="min-width: 70px"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @resp.reservations.each do |reservation| %>
+      <% reservation.instances.each do |instance| %>
+        <tr>
+          <td><%= instance.instance_id %></td>
+          <td>
+            <% instance.tags.each do |tag| %>
+              <% if tag.key == "Name" then %>
+                <%= tag.value %>
+              <% end %>
+            <% end %>
+          </td>
+          <td><%= instance.state.name %></td>
+          <td><%= instance.public_dns_name %></td>
+          <td><%= instance.public_ip_address %></td>
+          <td>
+            <% if instance.state.name == "running" then %>
+              <%= button_to "STOP", { :action => "stop_instance", :instance_id => instance.instance_id }, :method => :get %>
+            <% end %>
+            <% if instance.state.name == "stopped" then %>
+              <%= button_to "START", { :action => "start_instance", :instance_id => instance.instance_id }, :method => :get %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    <% end %>
+  </tbody>
+</table>
+
+<br />
+
+<%= button_to "ALL STOP", { :action => "stop_instance", :instance_id => 'all' }, :method => :get %>
+<%= button_to "ALL START", { :action => "start_instance", :instance_id => 'all' }, :method => :get %>
